@@ -1,0 +1,32 @@
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment (IMPORTANT)
+commai/
+venv/
+env/
+.venv/
+Lib/
+Scripts/
+Include/
+
+# Django stuff
+db.sqlite3
+/media/
+staticfiles/
+
+# Environment variables
+.env
+
+# IDE
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Jupyter notebooks (optional)
+*.ipynb_checkpoints

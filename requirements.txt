@@ -1,0 +1,11 @@
+django
+google-generativeai
+language_tool_python
+textblob
+transformers
+datasets
+pandas
+scikit-learn
+torch 
+torchvision
+textstat
