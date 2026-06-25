@@ -1,0 +1,10 @@
+# Django database
+db.sqlite3
+
+# Python bytecode/cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+commai/.env
