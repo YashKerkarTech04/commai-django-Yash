@@ -86,38 +86,58 @@ def evaluate_engagement(text):
 import requests
 
 def evaluate_grammar(text):
-    
+    if not text.strip():
+        return 100.00
+
     url = "https://api.languagetool.org/v2/check"
 
     data = {
-        'text': text,
-        'language': 'en-US',
+        "text": text,
+        "language": "en-US",
     }
 
-    response = requests.post(url, data=data)
-    result = response.json()
+    try:
+        response = requests.post(url, data=data, timeout=10)
 
-    num_errors = len(result.get('matches', []))
-    num_words = len(text.split())
+        print("Level Selector Grammar Status:", response.status_code)
 
-    if num_words == 0:
-        return 100.00  
+        if response.status_code != 200:
+            print("Level Selector Grammar Response:")
+            print(response.text)
+            return 100.00
 
-    num_uppercase = sum(1 for char in text if char.isupper())
-    num_lowercase = sum(1 for char in text if char.islower())
+        try:
+            result = response.json()
+        except ValueError:
+            print("LanguageTool returned invalid JSON")
+            print(response.text)
+            return 100.00
 
-    total_letters = num_uppercase + num_lowercase
-    if total_letters == 0:
-        uppercase_ratio = 0
-    else:
-        uppercase_ratio = num_uppercase / total_letters
+        num_errors = len(result.get("matches", []))
+        num_words = len(text.split())
 
-    error_penalty = num_errors / num_words  
-    score = (1 - error_penalty) * 100  
+        if num_words == 0:
+            return 100.00
 
-    score *= (1 - (uppercase_ratio * 0.1))  
+        num_uppercase = sum(1 for c in text if c.isupper())
+        num_lowercase = sum(1 for c in text if c.islower())
 
-    return round(max(min(score, 100), 0), 2)  
+        total_letters = num_uppercase + num_lowercase
+        uppercase_ratio = (
+            num_uppercase / total_letters
+            if total_letters > 0 else 0
+        )
+
+        error_penalty = num_errors / num_words
+        score = (1 - error_penalty) * 100
+
+        score *= (1 - (uppercase_ratio * 0.1))
+
+        return round(max(0, min(100, score)), 2)
+
+    except requests.exceptions.RequestException as e:
+        print("LanguageTool Request Failed:", e)
+        return 100.00
 
 
 

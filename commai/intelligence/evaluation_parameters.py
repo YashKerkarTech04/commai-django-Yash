@@ -2,36 +2,99 @@
 
 from textstat import flesch_reading_ease
 
+# def evaluate_clarity(text):
+#     if not text:
+#         return 0.00  
+#     score = flesch_reading_ease(text)
+#     if score > 100:
+#         score = 100 - (100 / (score - 99))
+#     return round(min(score, 100), 2)
+
+# updated clarity parameter
+
 def evaluate_clarity(text):
-    if not text:
-        return 0.00  
-
+    if not text.strip():
+        return 0.0
+    
     score = flesch_reading_ease(text)
-
-    if score > 100:
-        score = 100 - (100 / (score - 99))
-
-    return round(min(score, 100), 2)
+    
+    return round(max(0, min(score, 100)), 2)
 
 
 
 ####################################### Conciseness Evaluation Function 
 
-def evaluate_conciseness(text):
-    if not text.strip():  
-        return 0.00  
+# def evaluate_conciseness(text):
+#     if not text.strip():  
+#         return 0.00  
 
-    words = len(text.split())
-    sentences = len([s for s in text.split('.') if s.strip()])  
+#     words = len(text.split())
+#     sentences = len([s for s in text.split('.') if s.strip()])  
     
-    if sentences == 0:  
-        return 100.00
+#     if sentences == 0:  
+#         return 100.00
 
-    avg_sentence_length = words / sentences
+#     avg_sentence_length = words / sentences
 
-    score = 100 - avg_sentence_length  
+#     score = 100 - avg_sentence_length  
 
-    return round(max(min(score, 100), 0), 2)
+#     return round(max(min(score, 100), 0), 2)
+
+import re
+
+def evaluate_conciseness(text):
+    text = text.strip()
+
+    if not text:
+        return 0.00
+
+    words = text.split()
+    word_count = len(words)
+
+    # Split sentences using ., ! or ?
+    sentences = [s.strip() for s in re.split(r'[.!?]+', text) if s.strip()]
+    sentence_count = len(sentences)
+
+    if sentence_count == 0:
+        return 0.00
+
+    avg_length = word_count / sentence_count
+
+    # --------------------------------------------------
+    # Handle extremely short/choppy sentences
+    # Example: "The. Cat. Sat."
+    # --------------------------------------------------
+    if avg_length < 5:
+        score = avg_length * 15
+
+    else:
+        ideal_length = 15
+
+        if avg_length <= ideal_length:
+            # Mild penalty for being slightly shorter than ideal
+            difference = ideal_length - avg_length
+            score = 100 - (difference * 2)
+
+        else:
+            # Stronger penalty for long/wordy sentences
+            difference = avg_length - ideal_length
+            score = 100 - (difference * 5)
+
+    # --------------------------------------------------
+    # Penalize excessive repetition
+    # (Only for reasonably long text)
+    # --------------------------------------------------
+    unique_words = len(set(word.lower() for word in words))
+    variety_ratio = unique_words / word_count
+
+    if word_count >= 20 and variety_ratio < 0.5:
+        score -= 20
+
+    # Clamp score between 0 and 100
+    score = max(0.0, min(100.0, score))
+
+    return round(score, 2)
+    
 
 
 
@@ -86,39 +149,65 @@ def evaluate_engagement(text):
 import requests
 
 def evaluate_grammar(text):
-    
+
     url = "https://api.languagetool.org/v2/check"
 
     data = {
-        'text': text,
-        'language': 'en-US',
+        "text": text,
+        "language": "en-US",
     }
 
-    response = requests.post(url, data=data)
-    result = response.json()
+    try:
+        response = requests.post(url, data=data, timeout=10)
 
-    num_errors = len(result.get('matches', []))
-    num_words = len(text.split())
+        # Temporary debugging
+        print("Grammar API Status:", response.status_code)
 
-    if num_words == 0:
-        return 1.00  
+        if response.status_code != 200:
+            print("Grammar API Response:")
+            print(response.text)
+            return 0.00
 
-    num_uppercase = sum(1 for char in text if char.isupper())
-    num_lowercase = sum(1 for char in text if char.islower())
+        try:
+            result = response.json()
+            print("=" * 60)
+            print("STATUS:", response.status_code)
+            print("TEXT LENGTH:", len(text.split()))
+            print("BODY:")
+            print(response.text)
+            print("=" * 60)
+        except ValueError:
+            print("Grammar API returned invalid JSON")
+            print(response.text)
+            return 0.00
 
-    total_letters = num_uppercase + num_lowercase
-    if total_letters == 0:
-        uppercase_ratio = 0
-    else:
-        uppercase_ratio = num_uppercase / total_letters
+        num_errors = len(result.get("matches", []))
+        num_words = len(text.split())
 
-    error_penalty = num_errors / num_words  
-    score = (1 - error_penalty) * 100  
+        if num_words == 0:
+            return 0.00
 
-    score *= (1 - (uppercase_ratio * 0.1))  
+        num_uppercase = sum(1 for char in text if char.isupper())
+        num_lowercase = sum(1 for char in text if char.islower())
 
-    return round(max(min(score, 100), 0), 2)  
+        total_letters = num_uppercase + num_lowercase
 
+        uppercase_ratio = (
+            num_uppercase / total_letters
+            if total_letters > 0
+            else 0
+        )
+
+        error_penalty = num_errors / num_words
+
+        score = (1 - error_penalty) * 100
+        score *= (1 - (uppercase_ratio * 0.1))
+
+        return round(max(0.0, min(score, 100.0)), 2)
+
+    except requests.exceptions.RequestException as e:
+        print("Grammar API Request Failed:", e)
+        return 0.00
 
 
 ###################################### Vocabolary Usage Evaluation Function

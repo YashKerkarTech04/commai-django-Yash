@@ -4,30 +4,50 @@ def evaluate_conversation_grammar(text):
     url = "https://api.languagetool.org/v2/check"
 
     data = {
-        'text': text,
-        'language': 'en-US',
+        "text": text,
+        "language": "en-US",
     }
 
-    response = requests.post(url, data=data)
-    result = response.json()
+    try:
+        response = requests.post(url, data=data, timeout=10)
 
-    corrections = []
-    for match in result.get('matches', []):
-        start = match['offset']
-        end = start + match['length']
-        correction = {
-            'full_text': text,  # Store full text for reference
-            'before_error': text[:start],  # Text before the error
-            'error_text': text[start:end],  # The actual error part
-            'after_error': text[end:],  # Text after the error
-            'suggestion': [sugg['value'] for sugg in match['replacements'][:6]],  # Top 6 suggestions
-            'message': match['message'],
-            'offset': match['offset'],
-            'length': match['length']
-        }
-        corrections.append(correction)
+        # Debugging (temporary)
+        print("LanguageTool Status:", response.status_code)
 
-    return corrections
+        if response.status_code != 200:
+            print("LanguageTool Response:")
+            print(response.text)
+            return []
+
+        try:
+            result = response.json()
+        except ValueError:
+            print("LanguageTool returned invalid JSON")
+            print(response.text)
+            return []
+
+        corrections = []
+
+        for match in result.get("matches", []):
+            start = match["offset"]
+            end = start + match["length"]
+
+            corrections.append({
+                "full_text": text,
+                "before_error": text[:start],
+                "error_text": text[start:end],
+                "after_error": text[end:],
+                "suggestion": [r["value"] for r in match.get("replacements", [])[:6]],
+                "message": match.get("message", ""),
+                "offset": match.get("offset", 0),
+                "length": match.get("length", 0),
+            })
+
+        return corrections
+
+    except requests.exceptions.RequestException as e:
+        print("LanguageTool Request Failed:", e)
+        return []
 
 def evaluate_grammer_spelling(text):
     if text is None:
