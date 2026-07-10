@@ -2,16 +2,6 @@
 
 from textstat import flesch_reading_ease
 
-# def evaluate_clarity(text):
-#     if not text:
-#         return 0.00  
-#     score = flesch_reading_ease(text)
-#     if score > 100:
-#         score = 100 - (100 / (score - 99))
-#     return round(min(score, 100), 2)
-
-# updated clarity parameter
-
 def evaluate_clarity(text):
     if not text.strip():
         return 0.0
@@ -20,25 +10,7 @@ def evaluate_clarity(text):
     
     return round(max(0, min(score, 100)), 2)
 
-
-
 ####################################### Conciseness Evaluation Function 
-
-# def evaluate_conciseness(text):
-#     if not text.strip():  
-#         return 0.00  
-
-#     words = len(text.split())
-#     sentences = len([s for s in text.split('.') if s.strip()])  
-    
-#     if sentences == 0:  
-#         return 100.00
-
-#     avg_sentence_length = words / sentences
-
-#     score = 100 - avg_sentence_length  
-
-#     return round(max(min(score, 100), 0), 2)
 
 import re
 
@@ -95,9 +67,6 @@ def evaluate_conciseness(text):
 
     return round(score, 2)
     
-
-
-
 ####################################### Sentiment Evaluation Function
 
 from textblob import TextBlob
@@ -112,8 +81,6 @@ def evaluate_sentiment(text):
     subjectivity = sentiment.subjectivity * 100
 
     return round(min(max(subjectivity, 0), 100), 2)
-
-
 
 ####################################### Engagement Evaluation Function
 
@@ -141,8 +108,6 @@ def evaluate_engagement(text):
         engagement_score = min((engagement_score / max_possible_score) * 100, 100)
 
     return round(engagement_score, 2)
-
-
 
 ###################################### Grammer Evaluation Function
 
@@ -209,7 +174,6 @@ def evaluate_grammar(text):
         print("Grammar API Request Failed:", e)
         return 0.00
 
-
 ###################################### Vocabolary Usage Evaluation Function
 
 import re
@@ -263,8 +227,6 @@ def evaluate_vocabulary_usage(text):
     
     return round(min(score, 100), 2)
 
-
-
 ###################################### Grammer Evaluation Function
 
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -284,8 +246,6 @@ def evaluate_response_appropriateness(text):
     score = min(tfidf_sum * 10, 100)  
 
     return round(score, 2)
-
-
 
 ###################################### Politeness Evaluation Function
 
@@ -311,9 +271,6 @@ def evaluate_politeness(text):
     final_score = min(politeness_score, 100)
     
     return round(final_score, 2)
-
-
-
 
 ####################################### 
 
@@ -342,5 +299,3 @@ def evaluate_text(text):
     }
     
     return results
-
-####################################### 

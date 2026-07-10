@@ -5,7 +5,6 @@ from django.urls import path, include
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('app.urls')),  # Now correctly includes login view and auth paths from 'app.urls'
-    
     path('ask', views.ask, name = 'ask'),
     path('services/text_interaction/', views.text_interaction, name='text_interaction'),
     
