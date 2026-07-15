@@ -46,17 +46,29 @@ The system evaluates communication across multiple parameters, provides detailed
 
 ## 📸 Project Preview
 
-### 🏠 Home Page
-> **[Home Page Image Here]**
+### 🔐 Sign In Page
+<img width="1917" height="962" alt="Login" src="https://github.com/user-attachments/assets/094a12cc-17e3-41d2-b24f-baf3c5f52898" />
 
-### 💻 User Interface
-> **[User Interface Image Here]**
+### 📝 Sign Up Page
+<img width="1917" height="971" alt="Registration" src="https://github.com/user-attachments/assets/8862c0a9-415d-4f83-8d31-0060a7f6b43b" />
+
+### 🏠 Home Page
+<img width="1900" height="960" alt="HomePage" src="https://github.com/user-attachments/assets/f3d10692-138f-422c-8f6e-3ec5c0953b5a" />
 
 ### 💬 Text Interaction
-> **[Text Interface Image Here]**
+<img width="1897" height="972" alt="Text Interaction" src="https://github.com/user-attachments/assets/ba30c1ac-f961-44c2-84e9-48c2d6bb0e8d" />
+
+### 🎙️ Speech Interaction
+<img width="1911" height="963" alt="Speech Interaction" src="https://github.com/user-attachments/assets/e3c70e19-2d41-4842-912e-0780a8239ffe" />
 
 ### 📊 Evaluation Results
-> **[Evaluation Parameters Image Here]**
+<img width="1908" height="956" alt="EP1" src="https://github.com/user-attachments/assets/fea5ba31-f95f-418b-988c-6c55a714b55a" />
+<img width="1892" height="958" alt="EP2" src="https://github.com/user-attachments/assets/b1eb8e11-74f9-42ec-afef-f51e40503679" />
+<img width="1912" height="968" alt="EP3" src="https://github.com/user-attachments/assets/0bb307fc-8dce-4ca4-b11f-a2aaaaceeb26" />
+<img width="1890" height="962" alt="EP4" src="https://github.com/user-attachments/assets/9544b865-3912-4683-b0bc-36e103067f00" />
+
+### 🚨 Error Detection
+<img width="1907" height="962" alt="Error_Detector" src="https://github.com/user-attachments/assets/8f428bca-3d11-4626-8f5b-efc15647d84d" />
 
 ---
 
