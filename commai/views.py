@@ -25,6 +25,9 @@ import logging
 from django import template
 from django.contrib import messages
 
+from dotenv import load_dotenv
+load_dotenv()
+
 # spell_checker_module=SpellCheckerModule()
 
 register = template.Library()
@@ -125,8 +128,8 @@ logger = logging.getLogger(__name__)
 
 # Set API Key
 G_API_KEY = os.getenv("GEMINI_API_KEY")
+print("DEBUG - Gemini API Key loaded:", bool(G_API_KEY))
 genai.configure(api_key=G_API_KEY)
-
 # Use a stable Gemini model
 model = genai.GenerativeModel("gemini-3.5-flash")
 

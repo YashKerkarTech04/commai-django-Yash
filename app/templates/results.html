@@ -112,6 +112,24 @@
                         <h4>Vocabulary Usage</h4>
                     </div>
                 </div>
+
+                <!-- Persuasiveness Section -->
+                <div class="persuasiveness-wrapper">
+                    <div class="persuasiveness-info">
+                        <h4>6. Persuasiveness Score</h4>
+                        <p>Your persuasiveness score is <strong>{{ results.Persuasiveness }}%</strong>. This score reflects how convincing and confident your communication is — a higher score means your message effectively influences and engages your audience.</p>
+                        <p>Tips to improve persuasiveness:</p>
+                        <ul>
+                            <li>Use confident language instead of hedging words like "maybe" or "I guess."</li>
+                            <li>Support your claims with clear reasoning (e.g., "because," "therefore").</li>
+                            <li>Include a clear call to action to guide your audience toward a decision.</li>
+                        </ul>
+                    </div>
+                    <div class="progress" id="persuasivenessProgress" style="--i: {{ results.Persuasiveness }}; --clr:#47b5ff;">
+                        <h3 id="persuasivenessPercentage">{{ results.Persuasiveness }}<span>%</span></h3>
+                        <h4>Persuasiveness</h4>
+                    </div>
+                </div>
                 
                 <!-- Politeness Section -->
                 <div class="politeness-wrapper">
@@ -351,6 +369,7 @@
         animateProgress('grammar&spellingProgress', 'grammar&spellingPercentage', {{ results.Grammar}}, 5000);
         animateProgress('vocabularyProgress', 'vocabularyPercentage', {{ results.Usage }}, 5000);
         animateProgress('politenessProgress', 'politenessPercentage', {{ results.Politeness }}, 5000);
+        animateProgress('persuasivenessProgress', 'persuasivenessPercentage', {{ results.Persuasiveness }}, 5000);
     
     </script>
 </body>

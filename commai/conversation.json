@@ -1,9 +1,18 @@
 [
     {
         "sender": "User",
-        "text": "good good good good good good good good good good\ngood good good good good good good good good good\ngood good good good good"
+        "text": "hii"
     },
     {
-        "sender": "AI"
+        "sender": "AI",
+        "text": "Hello! How can I help you today?"
+    },
+    {
+        "sender": "User",
+        "text": "nice to meet you"
+    },
+    {
+        "sender": "AI",
+        "text": "Nice to meet you too! How can I help you today?"
     }
 ]

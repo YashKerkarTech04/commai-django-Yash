@@ -250,6 +250,39 @@ body {
     font-weight: bold;
 }
 
+.persuasiveness-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.persuasiveness-info {
+    width: 60%;
+    padding: 20px;
+    font-family: Arial, sans-serif;
+}
+
+.persuasiveness-info h4 {
+    font-size: 20px;
+    margin-bottom: 10px;
+}
+
+.persuasiveness-info p {
+    font-size: 16px;
+    line-height: 1.5;
+}
+
+#persuasivenessPercentage {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 25px;
+    font-weight: bold;
+}
+
 
 /*G&S*/
 .grammar-wrapper {

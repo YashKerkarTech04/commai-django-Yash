@@ -76,11 +76,15 @@ def evaluate_sentiment(text):
         return 0.00  
 
     blob = TextBlob(text)
-    sentiment = blob.sentiment
+    polarity = blob.sentiment.polarity; # -1.0 (negative) to +1.0 (positive)
+    subjectivity = blob.sentiment.subjectivity  # 0.0 (objective) to 1.0 (subjective)
 
-    subjectivity = sentiment.subjectivity * 100
+    # Map polarity (-1 to 1) onto a 0-100 tone score.
+    # Neutral (0) maps to 50; fully positive (1) maps to 100;
+    # fully negative (-1) maps to 0.
+    tone_score = (polarity + 1) * 50
 
-    return round(min(max(subjectivity, 0), 100), 2)
+    return round(min(max(tone_score, 0), 100), 2)
 
 ####################################### Engagement Evaluation Function
 
@@ -272,6 +276,68 @@ def evaluate_politeness(text):
     
     return round(final_score, 2)
 
+####################################### Persuasiveness Evaluation Function
+
+import re
+
+STRONG_MODALS = {
+    "will", "must", "should", "shall", "need to", "have to",
+    "definitely", "certainly", "undoubtedly", "clearly", "obviously"
+}
+
+REASONING_MARKERS = {
+    "because", "since", "therefore", "thus", "as a result",
+    "which means", "this shows", "proves that", "due to", "so that"
+}
+
+CALL_TO_ACTION = {
+    "you should", "we should", "let's", "let us", "i recommend",
+    "i suggest", "consider", "imagine", "think about", "make sure"
+}
+
+HEDGING_WORDS = {
+    "maybe", "perhaps", "possibly", "i think", "i guess",
+    "kind of", "sort of", "not sure", "might be", "could be"
+}
+
+def evaluate_persuasiveness(text):
+    text = text.strip()
+    if not text:
+        return 0.00
+
+    text_lower = re.sub(r'[^\w\s]', ' ', text.lower())
+
+    sentences = [s.strip() for s in re.split(r'[.!?]+', text) if s.strip()]
+    num_sentences = len(sentences)
+    if num_sentences == 0:
+        return 0.00
+
+    def count_phrases(phrase_set):
+        return sum(text_lower.count(phrase) for phrase in phrase_set)
+
+    modal_count = count_phrases(STRONG_MODALS)
+    reasoning_count = count_phrases(REASONING_MARKERS)
+    cta_count = count_phrases(CALL_TO_ACTION)
+    hedge_count = count_phrases(HEDGING_WORDS)
+
+    rhetorical_questions = len(re.findall(r'\b(why|how|what if|isn\'t it|don\'t you|wouldn\'t you)\b[^.!?]*\?', text_lower))
+
+    # Normalize positive signals against sentence count so longer text
+    # isn't rewarded just for having more words
+    positive_signal = (
+        (modal_count * 3) +
+        (reasoning_count * 4) +
+        (cta_count * 3) +
+        (rhetorical_questions * 2)
+    ) / num_sentences
+
+    # Hedging pulls the score down, also normalized by sentence count
+    hedge_penalty = (hedge_count * 5) / num_sentences
+
+    score = 50 + (positive_signal * 10) - (hedge_penalty * 10)
+
+    return round(max(0.0, min(score, 100.0)), 2)
+
 ####################################### 
 
 def evaluate_text(text):
@@ -284,7 +350,8 @@ def evaluate_text(text):
             "Grammar": 1,
             "Usage": 0,
             "Response": 0,
-            "Politeness": 0
+            "Politeness": 0,
+            "Persuasiveness": 0
         }
     
     results = {
@@ -295,7 +362,8 @@ def evaluate_text(text):
         "Grammar": evaluate_grammar(text),
         "Usage": evaluate_vocabulary_usage(text),
         "Response": evaluate_response_appropriateness(text),
-        "Politeness": evaluate_politeness(text)
+        "Politeness": evaluate_politeness(text),
+        "Persuasiveness": evaluate_persuasiveness(text)
     }
     
     return results
