@@ -14,9 +14,8 @@ from commai.intelligence.level_selector import select_level
 from .model import commai_summarys, predict_emotion, recommend_courses
 
 from app import views
-
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
-import google.generativeai as genai
+from groq import Groq
 from django.views.decorators.csrf import csrf_exempt
 import json
 import logging
@@ -120,18 +119,23 @@ def submit_conversation(request):
 
     return JsonResponse({"error": "Invalid request method"}, status=400)
 
-# Service-related views (no authentication needed)
 
 
 # Setup Logging
 logger = logging.getLogger(__name__)
 
 # Set API Key
-G_API_KEY = os.getenv("GEMINI_API_KEY")
-print("DEBUG - Gemini API Key loaded:", bool(G_API_KEY))
-genai.configure(api_key=G_API_KEY)
-# Use a stable Gemini model
-model = genai.GenerativeModel("gemini-3.5-flash")
+GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+groq_client = Groq(api_key=GROQ_API_KEY)
+
+COMMAI_SYSTEM_PROMPT = (
+    "You are CommAI, a friendly AI assistant built into the CommAI "
+    "communication analysis platform. You help users practice and improve "
+    "their communication skills through conversation. "
+    "If anyone asks who you are, what you are, or what model you're based on, "
+    "always respond that you are CommAI — never mention Llama, Groq, Meta, "
+    "or that you are a large language model. Stay in character as CommAI at all times."
+)
 
 @csrf_exempt
 def ask(request):
@@ -148,8 +152,14 @@ def ask(request):
             conversation_data = data.get("conversation", [])
             
             # Generate AI response
-            response = model.generate_content(user_input)
-            ai_response = response.text.strip() if hasattr(response, "text") else "AI response unavailable."
+            response = groq_client.chat.completions.create(
+                model="openai/gpt-oss-20b",
+                messages=[
+                    {"role": "system", "content": COMMAI_SYSTEM_PROMPT},
+                    {"role": "user", "content": user_input}
+                ]
+            )
+            ai_response = response.choices[0].message.content.strip() if response.choices else "AI response unavailable."
 
             # Append to conversation (but don't save yet)
             conversation_data.append({"sender": "User", "text": user_input})

@@ -149,52 +149,45 @@ class EmotionCNN(nn.Module):
 
 
 import os
-import google.generativeai as genai
+from groq import Groq
 from dotenv import load_dotenv
 
 load_dotenv()
 
-G_API_KEY = os.getenv("GEMINI_API_KEY")  # Replace with a secure method to load API key
-genai.configure(api_key=G_API_KEY)
-
-model = genai.GenerativeModel("gemini-3.5-flash")
-
-# def commai_summarys(text):
-#     """CommAI's summary generator using Gemini API"""
-#     base_prompt = (
-#         "As a CommAI's Summary Generator,\n\n"
-#         "Summarize the following text in a simple, user-friendly way. "
-#         "Make it engaging and easy to understand. Also, highlight "
-#         "key points clearly in a structured format."
-#     )
-    
-#     # Generate text with the Gemini model
-#     response = model.generate_content(f"{base_prompt}\n\n{text}")
-    
-#     if response.text:
-#         return f"CommAI's Summary Generator:\n\n{response.text.strip()}"
-#     else:
-#         return "CommAI's Summary Generator:\n\nSummary generation failed."
+GROQ_API_KEY = os.getenv("GROQ_API_KEY")  
+client = Groq(api_key=GROQ_API_KEY)
+MODEL_NAME = "openai/gpt-oss-20b"
 
 def commai_summarys(text):
     try:
-        base_prompt = (
-            "As a CommAI's Summary Generator,\n\n"
-            "Summarize the following text in a simple, user-friendly way."
+        response = client.chat.completions.create(
+            model=MODEL_NAME,
+            messages=[
+                {
+                    "role": "system",
+                    "content": (
+                        "You are CommAI's summary generator. Summarize the given "
+                        "conversation in a simple, user-friendly way. Make it engaging "
+                        "and easy to understand, and highlight key points clearly."
+                    )
+                },
+                {
+                    "role": "user",
+                    "content": text
+                }
+            ]
         )
 
-        response = model.generate_content(
-            f"{base_prompt}\n\n{text}"
-        )
+        summary = response.choices[0].message.content
 
-        if response.text:
-            return response.text
-
+        if summary:
+            return summary
+        
         return "Summary generation failed."
 
     except Exception as e:
-        print("Gemini Summary Error:", e)
-        return "Summary unavailable (Gemini quota exceeded)."
+        print("Groq Summary Error:", e)
+        return "Summary unavailable (Groq quota exceeded)."
     
     
 def predict_emotion(*args, **kwargs):
