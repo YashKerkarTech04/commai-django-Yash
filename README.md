@@ -39,7 +39,7 @@ The system evaluates communication across multiple parameters, provides detailed
 | **Database** | SQLite |
 | **NLP Libraries** | TextBlob, TextStat, Scikit-learn |
 | **Grammar Checking** | LanguageTool API |
-| **AI Integration** | Google Gemini API *(Currently Integrated)* |
+| **AI Integration** | Groq API |
 | **Speech-to-Text** | OpenAI Whisper *(Planned)* |
 
 ---
